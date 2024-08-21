@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabic Speech to Text with Fuzzy Search</title>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
+</head>
+<body>
+    <h1>Arabic Speech to Text with Fuzzy Search</h1>
+    <button id="startBtn">Start Recognition</button>
+    <p id="output"></p>
+    <p id="result"></p>
+
+    <script>
+        let quranData = [];
+
+        // Load the JSON data
+        fetch('processed_data.json')
+            .then(response => response.json())
+            .then(data => {
+                quranData = data;
+                console.log('Quran data loaded successfully.');
+            })
+            .catch(error => console.error('Error loading Quran data:', error));
+
+        const startBtn = document.getElementById('startBtn');
+        const output = document.getElementById('output');
+        const result = document.getElementById('result');
+
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'ar-SA'; // Set the language to Arabic (Saudi Arabia)
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        startBtn.addEventListener('click', () => {
+            output.textContent = 'Listening...';
+            recognition.start();
+
+            setTimeout(() => {
+                recognition.stop();
+            }, 5000); // Stop listening after 5 seconds
+        });
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            output.textContent = `Recognized text: ${transcript}`;
+            console.log(`Recognized text: ${transcript}`);
+
+            const searchResult = searchVerse(quranData, transcript);
+            result.textContent = searchResult ? searchResult : 'Verse not found.';
+        };
+
+        recognition.onerror = (event) => {
+            output.textContent = `Error occurred in recognition: ${event.error}`;
+        };
+
+        function searchVerse(quranData, searchText, fuzzyThreshold = 0.8) {
+            // Flatten the verses into a list for easy searching
+            const verseList = [];
+            quranData.forEach(surah => {
+                surah.verses.forEach(verse => {
+                    verseList.push({
+                        surah_name: surah.name,
+                        transliteration: surah.transliteration,
+                        verse_number: verse.id,
+                        text: verse.text
+                    });
+                });
+            });
+
+            const options = {
+                includeScore: true,
+                threshold: 1 - fuzzyThreshold, // Fuse.js uses a different scale for threshold
+                keys: ['text']
+            };
+
+            const fuse = new Fuse(verseList, options);
+
+            const result = fuse.search(searchText);
+
+            if (result.length > 0) {
+                const bestMatch = result[0].item;
+                return `Surah: ${bestMatch.surah_name} (Transliteration: ${bestMatch.transliteration}), Verse ${bestMatch.verse_number}: ${bestMatch.text}`;
+            } else {
+                return null;
+            }
+        }
+    </script>
+</body>
+</html>
