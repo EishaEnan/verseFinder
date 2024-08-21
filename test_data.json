@@ -1,0 +1,44 @@
+{
+    "tests": [
+        {
+            "search_text": "بكم عمي فهم لا ",
+            "expected_verse_number": 18
+        },
+        {
+            "search_text": "امن الرسول بما",
+            "expected_verse_number": 285
+        },
+        {
+            "search_text": "الحمد لله رب العالمين",
+            "expected_verse_number": 2
+        },
+        {
+            "search_text": "افا كنتم رعب",
+            "expected_verse_number": 23
+        },
+        {
+            "search_text": "واذ قلنا للملائكه",
+            "expected_verse_number": 34
+        },
+        {
+            "search_text": "كتب عليكم الصيام",
+            "expected_verse_number": 183
+        },
+        {
+            "search_text": "والتين والزيتون وت",
+            "expected_verse_number": 1
+        },
+        {
+            "search_text": "اليوم اكملت لكم",
+            "expected_verse_number": 3
+        },
+        {
+            "search_text": "انا اعطيناك",
+            "expected_verse_number": 1000
+        },
+        {
+            "search_text": "ان الدين عند الله الاسلام",
+            "expected_verse_number": 1000
+        }
+    ]
+}
